@@ -4,4 +4,4 @@ Snake Game
 
 Using Javascript & HTML
 
-Playing online link: 
+Playing online link: https://simingfu.github.io/EECS368-Project1/
