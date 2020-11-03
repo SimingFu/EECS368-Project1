@@ -1,6 +1,7 @@
 # EECS368-Project1
 
-It's a EECS 368 project
+Snake Game
 
-Playing online
-link: 
+Using Javascript & HTML
+
+Playing online link: 
