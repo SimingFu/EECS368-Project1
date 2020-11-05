@@ -14,8 +14,7 @@ let snake = [
 let changing_direction = false;
 let foodx;
 let foody;
-let dx = 20;
-let dy = 0;
+let vel = {x: 20, y: 0};
 
 
 // Start game
@@ -51,13 +50,6 @@ function drawSnake() {
   snake.forEach(drawSnakePart)
 }
 
-function drawFood() {
-  context.fillStyle = '#ff4dff';
-  context.strokestyle = 'black';
-  context.fillRect(foodx, foody, 20, 20);
-  context.strokeRect(foodx, foody, 20, 20);
-}
-
 function drawSnakePart(snakePart) {
   context.fillStyle = '#1affff';
   context.strokestyle = 'black';
@@ -65,24 +57,44 @@ function drawSnakePart(snakePart) {
   context.strokeRect(snakePart.x, snakePart.y, 20, 20);
 }
 
+function updateSnake() {
+  let head = {x: snake[0].x + vel.x, y: snake[0].y + vel.y};
+  snake.unshift(head);
+  if (snake[0].x == foodx && snake[0].y == foody) {
+    initfood();
+  }
+  else {
+    snake.pop();
+  }
+}
+
+function drawFood() {
+  context.fillStyle = '#ff4dff';
+  context.strokestyle = 'black';
+  context.fillRect(foodx, foody, 20, 20);
+  context.strokeRect(foodx, foody, 20, 20);
+}
+
 function endgame() {
   for (let i = 4; i < snake.length; i++) {
-    if (snake[i].x === snake[0].x && snake[i].y === snake[0].y) return true
+    if (snake[i].x == snake[0].x && snake[i].y == snake[0].y) {
+      return true;
+    }
   }
-  let hitLeftWall = snake[0].x < 0;
-  let hitRightWall = snake[0].x > canvas.width - 20;
-  let hitToptWall = snake[0].y < 0;
-  let hitBottomWall = snake[0].y > canvas.height - 20;
-  return hitLeftWall || hitRightWall || hitToptWall || hitBottomWall
+  return (snake[0].x < 0 || snake[0].x > canvas.width - 20 || snake[0].y < 0
+          || snake[0].y > canvas.height - 20)
+}
+
+function eat(part) {
+  if (part.x == foodx && part.y == foody){
+    initfood();
+  }
 }
 
 function initfood() {
   foodx = Math.round((Math.random() * (canvas.width - 20-0) + 0) / 20) * 20;
   foody = Math.round((Math.random() * (canvas.height - 20-0) + 0) / 20) * 20;
-  snake.forEach(function has_snake_eaten_food(part) {
-    let has_eaten = part.x == foodx && part.y == foody;
-    if (has_eaten) initfood();
-  });
+  snake.forEach(eat);
 }
 
 document.addEventListener("keydown", change_direction);
@@ -94,37 +106,24 @@ function change_direction(e) {
 
   if (changing_direction) return;
   changing_direction = true;
-  let keyPressed = e.keyCode;
-  let goingUp = dy === -20;
-  let goingDown = dy === 20;
-  let goingRight = dx === 20;
-  let goingLeft = dx === -20;
-  if (keyPressed === LEFT_KEY && !goingRight) {
-    dx = -20;
-    dy = 0;
+  let goingUp = vel.y
+  let goingDown = vel.y
+  let goingRight = vel.x
+  let goingLeft = vel.x
+  if (e.keyCode == LEFT_KEY && goingRight != 20) {
+    vel.x = -20;
+    vel.y = 0;
   }
-  if (keyPressed === UP_KEY && !goingDown) {
-    dx = 0;
-    dy = -20;
+  else if (e.keyCode == UP_KEY && goingDown != 20) {
+    vel.x = 0;
+    vel.y = -20;
   }
-  if (keyPressed === RIGHT_KEY && !goingLeft) {
-    dx = 20;
-    dy = 0;
+  else if (e.keyCode == RIGHT_KEY && goingLeft != -20) {
+    vel.x = 20;
+    vel.y = 0;
   }
-  if (keyPressed === DOWN_KEY && !goingUp) {
-    dx = 0;
-    dy = 20;
-  }
-}
-
-function updateSnake() {
-  let head = {x: snake[0].x + dx, y: snake[0].y + dy};
-  snake.unshift(head);
-  let eatfood = snake[0].x === foodx && snake[0].y === foody;
-  if (eatfood) {
-    initfood();
-  }
-  else {
-    snake.pop();
+  else if (e.keyCode == DOWN_KEY && goingUp != -20) {
+    vel.x = 0;
+    vel.y = 20;
   }
 }
